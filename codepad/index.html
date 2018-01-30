@@ -147,6 +147,7 @@
             </select>
             <button onclick="codepad_restart()">Restart</button>
             <button onclick="codepad_reload()">Reload</button>
+            <button onclick="codepad_share()">Share</button>
         </div>
         <div id="console"></div>
         <div id="editor-wrap">
@@ -184,6 +185,8 @@ end
       <script type='text/javascript' src="dmloader.js"></script>
       <script type='text/javascript' src="DefoldCodePad.js" async onload=""></script>
     <!-- -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js" type="text/javascript"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js" integrity="sha256-U//RSeH3TR3773Rk+1lAufJnRjEaG5LcdbvGV72kHEM=" crossorigin="anonymous"></script>
     <script>
@@ -258,23 +261,34 @@ end
           codepad_should_restart = true;
         }
 
-        function codepad_get_code() {
-            return editor.session.getDocument().getValue();
+        var deparam = function (querystring) {
+          // remove any preceding url and split
+          querystring = querystring.substring(querystring.indexOf('?')+1).split('&');
+          var params = {}, pair, d = decodeURIComponent;
+          // march and parse
+          for (var i = querystring.length - 1; i >= 0; i--) {
+            pair = querystring[i].split('=');
+            params[d(pair[0])] = d(pair[1] || '');
+          }
+
+          return params;
+        };
+
+        // handle url and shared data
+        var codepad_params = deparam(window.location.hash);
+        if (codepad_params.s !== undefined) {
+          var src = LZString.decompressFromBase64(codepad_params.s);
+          editor.setValue(src);
         }
 
-        // function codepad_get_func_init() {
-        //   var func_init_elem = document.getElementById("func_init");
-        //   var ret_str = "return function(self)\n" + func_init_elem.value + "\nend"
-        //   // console.log(ret_str);
-        //   return ret_str;
-        // }
+        function codepad_share() {
+          var compressed_code = LZString.compressToBase64(codepad_get_code());
+          window.location.hash = "?s=" + compressed_code;
+        }
 
-        // function codepad_get_func_update() {
-        //   var func_update_elem = document.getElementById("func_update");
-        //   var ret_str = "return function(self, dt)\n" + func_update_elem.value + "\nend"
-        //   // console.log(ret_str);
-        //   return ret_str;
-        // }
+        function codepad_get_code() {
+            return editor.getValue();
+        }
 
         codepad_should_reload = false;
         codepad_should_restart = true;
