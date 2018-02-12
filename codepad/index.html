@@ -79,7 +79,7 @@
         #editor-wrap {
             width: 100%;
             position: absolute;
-            top: 240px;
+            top: 270px;
             bottom: 0px;
         }
 
@@ -88,6 +88,40 @@
             height: 100%;
         }
 
+        #files {
+            position: absolute;
+            top: 240px;
+            height: 30px;
+            font-family: monospace;
+            width: 100%;
+            padding: 0px 0px 0px 50px;
+            margin: 0px;
+            border: 0px;
+        }
+
+        #files label {
+          margin: 0px;
+          padding: 0px;
+          height: 30px;
+          line-height: 30px;
+          padding: 0px 24px 0px 24px;
+          border: none;
+          border-radius: 6px 6px 0px 0px;
+          display: inline-block;
+          background: #1f1f1f;
+        }
+
+        #files input {
+          margin: 0px;
+          padding: 0px;
+          display: none;
+        }
+
+        #files [type=radio]:checked + label
+        {
+          background: #2d2d2d;
+          font-weight: bold;
+        }
 
         .canvas-app-container {
           background: #000;
@@ -132,26 +166,7 @@
 </head>
 
 <body>
-
-    <div id="layout">
-        <div id="pane-left">
-        <div id="app-container" class="canvas-app-container">
-            <canvas id="canvas" class="canvas-app-canvas" tabindex="1" width="720" height="720"></canvas>
-        </div>
-        <button id="fullscreen" class="button" hidden="true">Fullscreen</button>
-    </div>
-    <div id="pane-right">
-        <div id="toolbar">Scene:
-            <select disabled="true">
-                <option value="sprite">GO + Sprite</option>
-            </select>
-            <button onclick="codepad_restart()">Restart</button>
-            <button onclick="codepad_reload()">Reload</button>
-            <button onclick="codepad_share()">Share</button>
-        </div>
-        <div id="console"></div>
-        <div id="editor-wrap">
-            <div id="editor">function init(self)
+    <div id="default_script" style="display: none;">function init(self)
     go.animate(".", "position.y", go.PLAYBACK_LOOP_PINGPONG, 100, go.EASING_LINEAR, 2)
 end
 
@@ -175,6 +190,27 @@ function on_reload(self)
 
 end
 </div>
+    <div id="layout">
+        <div id="pane-left">
+        <div id="app-container" class="canvas-app-container">
+            <canvas id="canvas" class="canvas-app-canvas" tabindex="1" width="720" height="720"></canvas>
+        </div>
+        <button id="fullscreen" class="button" hidden="true">Fullscreen</button>
+    </div>
+    <div id="pane-right">
+        <div id="toolbar">Collection:
+            <select id="scene" onchange="codepad_change_scene()">
+                <option value="#cp_sprite">GO + Sprite</option>
+                <option value="#cp_two_gos">Two GOs</option>
+            </select>
+            <button onclick="codepad_restart()">Restart</button>
+            <button onclick="codepad_reload()">Reload</button>
+            <button onclick="codepad_share()">Share</button>
+        </div>
+        <div id="console"></div>
+        <div id="files"></div>
+        <div id="editor-wrap">
+            <div id="editor"></div>
         </div>
     </div>
 </div>
@@ -190,9 +226,10 @@ end
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js" integrity="sha256-U//RSeH3TR3773Rk+1lAufJnRjEaG5LcdbvGV72kHEM=" crossorigin="anonymous"></script>
     <script>
+        var EditSession = require("ace/edit_session").EditSession;
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/tomorrow_night_eighties");
-        editor.session.setMode("ace/mode/lua");
+        //editor.session.setMode("ace/mode/lua");
     </script>
 
     <script type='text/javascript'>
@@ -219,7 +256,6 @@ end
             bar_id: "defold-progress-bar",
 
             addProgress : function (canvas) {
-                /* Insert default progress bar below canvas */
                 canvas.insertAdjacentHTML('afterend', '<div id="' + Progress.progress_id + '" class="canvas-app-progress"><div id="' + Progress.bar_id + '" class="canvas-app-progress-bar" style="width: 0%;">0%</div></div>');
                 Progress.bar = document.getElementById(Progress.bar_id);
                 Progress.progress = document.getElementById(Progress.progress_id);
@@ -247,6 +283,63 @@ end
           Module.toggleFullscreen();
         };
 
+        function codepad_change_scene() {
+          codepad_should_change_scene = true;
+        }
+
+        function codepad_get_scene() {
+          var scenes_elem = document.getElementById("scene");
+          return scenes_elem.options[scenes_elem.selectedIndex].value;
+        }
+
+        var codepad_file_info = "";
+        var codepad_sessions = [];
+        function codepad_set_session(session_info) {
+          var files_div = document.getElementById("files");
+          files_div.innerHTML = "";
+
+          codepad_file_info = session_info;
+          codepad_sessions = [];
+
+          var default_script = document.getElementById("default_script");
+          var default_content = default_script.innerText;
+
+          var new_buttons = "";
+          for (var i = 0; i < session_info.length; i++)
+          {
+            var radio_id = "file_" + (i+1);
+            var src_data = default_content;
+            if (codepad_shared_sources[i] !== undefined) {
+              src_data = codepad_shared_sources[i];
+            }
+            var file_session = new EditSession(src_data);
+            file_session.setMode("ace/mode/lua");
+            codepad_sessions[i] = file_session;
+            var checked = "";
+            if (i == 0) {
+              checked = " checked";
+              editor.setSession(file_session);
+            }
+            var new_file_button = '<input type="radio" onchange="codepad_change_file()" id="' + radio_id + '" name="current_file" value="' + radio_id + '"' + checked + '><label for="' + radio_id + '">' + session_info[i] + '</label>';
+            new_buttons = new_buttons + new_file_button;
+          }
+          files_div.innerHTML = new_buttons;
+
+        }
+
+        function codepad_change_file() {
+          var file_tabs = document.getElementsByName('current_file');
+
+          for (var i = 0, length = file_tabs.length; i < length; i++)
+          {
+            if (file_tabs[i].checked)
+            {
+              editor.setSession(codepad_sessions[i]);
+              break;
+            }
+          }
+        }
+
         function codepad_update_console(text) {
           var console_elem = document.getElementById("console");
           console_elem.innerText = text;
@@ -259,6 +352,13 @@ end
 
         function codepad_restart() {
           codepad_should_restart = true;
+        }
+
+        function codepad_get_code(i) {
+            if (codepad_sessions[i-1]) {
+              return codepad_sessions[i-1].getDocument().getValue();
+            }
+            return "";
         }
 
         var deparam = function (querystring) {
@@ -275,23 +375,46 @@ end
         };
 
         // handle url and shared data
+        var codepad_shared_sources = [];
         var codepad_params = deparam(window.location.hash);
-        if (codepad_params.s !== undefined) {
-          var src = LZString.decompressFromBase64(codepad_params.s);
-          editor.setValue(src);
+        if (codepad_params.c !== undefined) {
+
+          // Change scene
+          var scenes_elem = document.getElementById("scene");
+          for (var i = 0; i < scenes_elem.options.length; i++) {
+            if (scenes_elem.options[i].value == codepad_params.c) {
+              scenes_elem.selectedIndex = i;
+              break;
+            }
+          }
+
+          for (var key in codepad_params) {
+            if (codepad_params.hasOwnProperty(key)) {
+              if (key.charAt(0) == 's') {
+                var src_index = key.substr(1);
+                src_index = parseInt(src_index);
+                codepad_shared_sources[src_index - 1] = LZString.decompressFromBase64(codepad_params[key]);
+              }
+            }
+          }
+
         }
 
         function codepad_share() {
-          var compressed_code = LZString.compressToBase64(codepad_get_code());
-          window.location.hash = "?s=" + compressed_code;
-        }
+          var share_url = "?c=" + codepad_get_scene();
+          for (var i = 0; i < codepad_sessions.length; i++)
+          {
+            var compressed_code = LZString.compressToBase64(codepad_get_code(i+1));
+            compressed_code = "&s" + (i+1) + "=" + compressed_code;
+            share_url = share_url + compressed_code;
+          }
 
-        function codepad_get_code() {
-            return editor.getValue();
+          window.location.hash = share_url;
         }
 
         codepad_should_reload = false;
-        codepad_should_restart = true;
+        codepad_should_restart = false;
+        codepad_should_change_scene = true;
 
     </script>
     <script type="text/javascript">
