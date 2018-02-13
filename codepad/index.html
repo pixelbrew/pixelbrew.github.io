@@ -342,7 +342,7 @@ end
 
         function codepad_update_console(text) {
           var console_elem = document.getElementById("console");
-          console_elem.innerText = text;
+          console_elem.innerHTML = text;
           console_elem.scrollTop = console_elem.scrollHeight;
         }
 
