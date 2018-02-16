@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet">
+
     <title>DefoldCodePad 0.1</title>
     <style>
 
@@ -17,37 +19,140 @@
         }
 
         body {
-            color: #eee;
-            background-color: #15181c;
+            color: #cccfd4;
+            background-color: #212428;
             height: 100%;
             overflow: auto;
-            font-family: sans-serif;
-            font-size: 0.9em;
+            font-size: 13px;
+            font-family: 'Source Sans Pro', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         *:focus {
             outline: none;
         }
 
-        #layout {
-            height: 100%;
+        button, input, select {
+            -webkit-appearance: none;
+            -webkit-border-radius: 0px;
+            background: #434448;
+            border-radius: 2px;
+            border: none;
+            color: #b3b4b5;
+            height: 28px;
+            padding: 0px 14px 0px 14px;
+            margin: 0px 4px 0px 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Source Sans Pro', sans-serif;
+            transition: background 0.6s ease 0s;
         }
 
-        #pane-left {
+        button:active, input:active, select:active {
+            background: #5c5d61;
+            transition: background 0.0s ease 0s;
+        }
+
+        #toolbar {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            top: 0px;
+            height: 60px;
+            line-height: 60px;
+            color: #737679;
+        }
+
+        #share-wrap {
             position: absolute;
             top: 0px;
-            left: 0px;
-            bottom: 0px;
-            right: 50%;
-            width: 50%;
-            height: 100%;
+            right: 0px;
         }
 
-        #pane-right {
+        #layout {
             position: absolute;
-            left: 50%;
-            width: 50%;
-            height: 100%;
+            top: 60px;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+        }
+
+        .pane-content {
+            background-color: #2c2e33;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .tabs-wrap {
+            position: absolute;
+            top: 0px;
+            height: 38px;
+            width: 100%;
+            padding: 0px 0px 0px 0px;
+            margin: 0px;
+            border: 0px;
+            font-size: 13px;
+        }
+
+        .tabs-wrap label {
+          opacity: 0.4;
+          color: #eff2f6;
+          margin: 0px;
+          padding: 0px;
+          height: 38px;
+          line-height: 38px;
+          padding: 0px 12px 0px 12px;
+          border: none;
+          border-bottom: 2px solid #212428;
+          display: inline-block;
+          transition: all 0.2s ease 0s;
+        }
+
+        .tabs-wrap input {
+          margin: 0px;
+          padding: 0px;
+          display: none;
+        }
+
+        .tabs-wrap [type=radio]:checked + label
+        {
+          opacity: 1;
+          color: #eff2f6;
+          border-bottom: 2px solid #fd6623;
+        }
+
+        svg {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        #pane-editor, #pane-console {
+            position: relative;
+        }
+
+        #editor-wrap {
+            width: 100%;
+            position: absolute;
+            top: 40px;
+            bottom: 0px;
+        }
+
+        #editor-wrap > button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 999999;
+        }
+
+        #editor {
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
         }
 
         #canvas {
@@ -55,84 +160,54 @@
             height: 100%;
         }
 
-        #toolbar {
+        #console-wrap {
             position: absolute;
-            left: 10px;
-            right: 10px;
-            top: 200px;
-            height: 40px;
-            line-height: 40px;
+            top: 40px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
         }
 
         #console {
             position: absolute;
-            top: 0px;
-            height: 200px;
-            font-family: monospace;
-            width: 100%;
+            top: 8px;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
             padding: 0px;
             margin: 0px;
             border: 0px;
-            overflow: scroll;
+            overflow: auto;
+            font-size: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
         }
 
-        #editor-wrap {
-            width: 100%;
-            position: absolute;
-            top: 270px;
-            bottom: 0px;
+        .gutter {
         }
 
-        #editor {
-            width: 100%;
-            height: 100%;
+        .gutter.gutter-horizontal {
+          background-image: url('grips/vertical.png');
+          cursor: ew-resize;
         }
 
-        #files {
-            position: absolute;
-            top: 240px;
-            height: 30px;
-            font-family: monospace;
-            width: 100%;
-            padding: 0px 0px 0px 50px;
-            margin: 0px;
-            border: 0px;
+        .gutter.gutter-vertical {
+          background-image: url('grips/horizontal.png');
+          cursor: ns-resize;
         }
 
-        #files label {
-          margin: 0px;
-          padding: 0px;
-          height: 30px;
-          line-height: 30px;
-          padding: 0px 24px 0px 24px;
-          border: none;
-          border-radius: 6px 6px 0px 0px;
-          display: inline-block;
-          background: #1f1f1f;
-        }
-
-        #files input {
-          margin: 0px;
-          padding: 0px;
-          display: none;
-        }
-
-        #files [type=radio]:checked + label
-        {
-          background: #2d2d2d;
-          font-weight: bold;
+        .split.split-horizontal, .gutter.gutter-horizontal {
+          height: 100%;
+          float: left;
         }
 
         .canvas-app-container {
           background: #000;
-          /* A positioned parent for loading visuals */
           position: relative;
           width: 100%;
           height: 100%;
         }
 
         .canvas-app-container:-webkit-full-screen {
-          /* Auto width and height in Safari/Chrome fullscreen. */
           width: auto;
           height: auto;
         }
@@ -190,27 +265,83 @@ function on_reload(self)
 
 end
 </div>
-    <div id="layout">
-        <div id="pane-left">
-        <div id="app-container" class="canvas-app-container">
-            <canvas id="canvas" class="canvas-app-canvas" tabindex="1" width="720" height="720"></canvas>
-        </div>
-        <button id="fullscreen" class="button" hidden="true">Fullscreen</button>
+<div id="icons" style="display: none;">
+    <div id="icon-script">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14">
+            <path fill="#F4F63D" fill-rule="evenodd" d="M8.362 7a1.362 1.362 0 0 1-2.724 0 1.362 1.362 0 0 1 2.724 0M7 9.458a2.458 2.458 0 0 1-2.455-2.456A2.458 2.458 0 0 1 7 4.546a2.458 2.458 0 0 1 2.455 2.456A2.458 2.458 0 0 1 7 9.458m6.4-3.706c-.39-.043-1.196-.146-1.204-.147l-.007-.001a.866.866 0 0 1-.662-.837c0-.164.05-.323.144-.447h.001c.038-.061.182-.253.734-.971a.625.625 0 0 0-.013-.794 5.806 5.806 0 0 0-.947-.947.65.65 0 0 0-.413-.149.59.59 0 0 0-.38.134l-.956.736-.008.005a.952.952 0 0 1-.47.14.841.841 0 0 1-.822-.695L8.249.6a.673.673 0 0 0-.58-.567 6.713 6.713 0 0 0-1.338 0A.673.673 0 0 0 5.75.6l-.147 1.176a.838.838 0 0 1-.824.699.906.906 0 0 1-.503-.157l-.93-.723a.59.59 0 0 0-.38-.135.65.65 0 0 0-.412.148c-.351.278-.67.597-.947.947a.608.608 0 0 0-.016.793l.707.928a.808.808 0 0 1 .174.492c0 .42-.305.773-.726.838l-1.148.147a.655.655 0 0 0-.566.579 6.858 6.858 0 0 0 0 1.341c.04.3.274.54.566.58l1.146.147a.826.826 0 0 1 .554 1.33l-.705.926a.625.625 0 0 0 .013.794c.278.35.596.67.947.947a.651.651 0 0 0 .404.148c.15 0 .29-.048.387-.132l.928-.723a.908.908 0 0 1 .507-.16c.406 0 .76.3.823.698l.001.01.147 1.168c.04.292.279.525.58.566.23.015.456.029.669.029.213 0 .44-.014.672-.03a.672.672 0 0 0 .577-.566l.147-1.175c.083-.414.421-.7.824-.7.18 0 .354.053.476.145l.956.736c.1.086.24.134.39.134a.57.57 0 0 0 .402-.146c.353-.28.671-.598.948-.948a.625.625 0 0 0 .016-.793c-.554-.717-.698-.911-.736-.974l-.001.001a.761.761 0 0 1-.144-.462c0-.396.28-.742.664-.823.013-.001.819-.104 1.211-.147a.673.673 0 0 0 .565-.582c.044-.45.044-.901 0-1.339a.673.673 0 0 0-.566-.579"/>
+        </svg>
     </div>
-    <div id="pane-right">
-        <div id="toolbar">Collection:
-            <select id="scene" onchange="codepad_change_scene()">
-                <option value="#cp_sprite">GO + Sprite</option>
-                <option value="#cp_two_gos">Two GOs</option>
-            </select>
-            <button onclick="codepad_restart()">Restart</button>
-            <button onclick="codepad_reload()">Reload</button>
-            <button onclick="codepad_share()">Share</button>
+</div>
+    <div id="toolbar">Collection:
+        <select id="scene" onchange="codepad_change_scene()">
+            <option value="#cp_sprite">GO + Sprite</option>
+            <option value="#cp_two_gos">Two GOs</option>
+        </select>
+        <button onclick="codepad_restart()">Restart</button>
+        <div id="share-wrap">
+            <button onclick="codepad_share()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="2 0 16 18">
+                    <defs>
+                        <filter id="a" width="101.4%" height="136.7%" x="-.5%" y="-11.7%" filterUnits="objectBoundingBox">
+                            <feOffset dy="2" in="SourceAlpha" result="shadowOffsetOuter1"/>
+                            <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2"/>
+                            <feColorMatrix in="shadowBlurOuter1" result="shadowMatrixOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                            <feMerge>
+                                <feMergeNode in="shadowMatrixOuter1"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g fill="none" fill-rule="evenodd" filter="url(#a)" opacity=".6" transform="translate(1 -1)">
+                        <circle cx="11" cy="5" r="2" fill="#FFF"/>
+                        <path stroke="#FFF" stroke-linecap="square" d="M5.5 8.5l5.528-3.528"/>
+                        <circle cx="11" cy="12.5" r="2" fill="#FFF"/>
+                        <path stroke="#FFF" stroke-linecap="square" d="M5.5 8.972l5.528 3.528"/>
+                        <circle cx="5" cy="9" r="2" fill="#FFF"/>
+                    </g>
+                </svg>Share</button>
+            <svg xmlns="http://www.w3.org/2000/svg" width="135" height="32" viewBox="0 0 135 32">
+                <defs>
+                    <filter id="a" width="101.4%" height="136.7%" x="-.5%" y="-11.7%" filterUnits="objectBoundingBox">
+                        <feOffset dy="2" in="SourceAlpha" result="shadowOffsetOuter1"/>
+                        <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2"/>
+                        <feColorMatrix in="shadowBlurOuter1" result="shadowMatrixOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                        <feMerge>
+                            <feMergeNode in="shadowMatrixOuter1"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <g fill="#F0F2F6" fill-rule="evenodd" filter="url(#a)" opacity=".7" transform="translate(-1131 -16)">
+                    <path d="M1159.427 31.98v-4.215l-4.07-2.35v-4.702l-3.654-2.108v4.7l-4.07-2.35v4.217l4.071 2.35v4.701l3.652 2.11V29.63l4.07 2.349h.001zm-.21.367l-3.442-1.988v3.973l3.443-1.985zm-3.86 6.686v-3.975l-3.443 1.988 3.442 1.987zm-.21.363l-4.072-2.35 4.071-2.351-3.652-2.109-4.071 2.35-4.071-2.35-3.653 2.109 4.072 2.35-4.072 2.351 3.653 2.109 4.071-2.35 4.072 2.35 3.651-2.109zm-16.076-5.062V30.36l-3.442 1.985 3.442 1.99zm4.49-15.73v3.975l3.443-1.987-3.442-1.988zm0 13.62l3.653 2.108v-4.217l-3.652-2.108v4.217zm3.862-6.689l-3.652 2.109 3.652 2.108 3.652-2.108-3.652-2.109zm12.423 1.988v4.943l-4.071 2.35v4.701l-4.28 2.472-4.072-2.351-4.071 2.35-4.28-2.471v-4.7L1135 32.465v-4.943l4.071-2.35V20.47l4.28-2.471 4.072 2.35 4.071-2.35 4.28 2.471v4.701l4.072 2.351zM1257.528 32.42c-.26.534-.608.961-1.043 1.282-.434.32-.935.551-1.503.691-.568.14-1.159.21-1.773.21h-1.527a.097.097 0 0 1-.097-.096v-8.103c0-.054.044-.097.097-.097h1.607a7.3 7.3 0 0 1 1.713.2 4.176 4.176 0 0 1 1.483.672 3.36 3.36 0 0 1 1.043 1.262c.26.528.39 1.193.39 1.994 0 .789-.13 1.45-.39 1.984zm3.256-5.352c-.467-.908-1.082-1.633-1.843-2.174a7.449 7.449 0 0 0-2.606-1.163 12.694 12.694 0 0 0-2.966-.35h-5.033a.097.097 0 0 0-.097.097v13.995c0 .053.043.097.097.097h5.193c.976 0 1.938-.137 2.886-.41a7.603 7.603 0 0 0 2.556-1.283 6.488 6.488 0 0 0 1.823-2.225c.461-.902.692-1.974.692-3.217 0-1.336-.234-2.458-.702-3.367zm-19.181 4.97h-3.29a.097.097 0 0 1-.09-.13l1.663-4.49a.097.097 0 0 1 .182 0l1.626 4.49a.097.097 0 0 1-.091.13zm.123-8.597a.097.097 0 0 0-.09-.06h-3.197a.097.097 0 0 0-.09.06l-5.87 13.994a.097.097 0 0 0 .09.135h3.514c.04 0 .076-.025.09-.063l.995-2.66a.097.097 0 0 1 .091-.063h5.358c.04 0 .076.025.09.062l1.054 2.663c.015.037.05.06.09.06h3.597c.07 0 .116-.07.09-.133l-5.812-13.995zm-11.296 5.16c-.134.221-.317.398-.551.532a2.469 2.469 0 0 1-.792.28c-.294.054-.6.08-.922.08h-1.345a.097.097 0 0 1-.098-.097v-3.152c0-.054.044-.098.098-.098h1.406c.307 0 .604.02.891.06.288.04.545.12.772.241a1.4 1.4 0 0 1 .541.501c.134.214.2.488.2.822 0 .334-.066.611-.2.832zm3.167 1.243c.307-.568.46-1.266.46-2.094 0-.815-.143-1.5-.43-2.055a3.595 3.595 0 0 0-1.183-1.342 5.13 5.13 0 0 0-1.763-.742 9.794 9.794 0 0 0-2.175-.23h-5.113a.097.097 0 0 0-.098.097v13.995c0 .053.044.097.098.097h3.232a.097.097 0 0 0 .097-.097v-5.157c0-.054.044-.097.098-.097h1.606c.735 0 1.443-.08 2.124-.24a5.477 5.477 0 0 0 1.804-.762 3.787 3.787 0 0 0 1.243-1.373zm-12.06 4.897v2.732a.097.097 0 0 1-.096.097h-9.706a.097.097 0 0 1-.097-.097V23.478c0-.054.043-.097.097-.097h9.345c.054 0 .097.043.097.097v2.692a.097.097 0 0 1-.097.097h-6.039a.097.097 0 0 0-.097.097v2.491c0 .054.044.097.097.097h5.698c.054 0 .098.044.098.097v2.552a.097.097 0 0 1-.098.097h-5.698a.097.097 0 0 0-.097.097v2.752c0 .053.044.097.097.097h6.4c.053 0 .097.043.097.097zm-15.413-2.322c-.26.535-.608.962-1.042 1.283-.434.32-.935.551-1.503.691-.568.14-1.159.21-1.773.21h-1.527a.097.097 0 0 1-.097-.096v-8.103c0-.054.044-.097.097-.097h1.607a7.3 7.3 0 0 1 1.713.2 4.176 4.176 0 0 1 1.483.672 3.36 3.36 0 0 1 1.042 1.262c.261.528.391 1.193.391 1.994 0 .789-.13 1.45-.39 1.984zm1.413-7.525a7.45 7.45 0 0 0-2.605-1.163 12.694 12.694 0 0 0-2.966-.35h-5.034a.097.097 0 0 0-.097.097v13.995c0 .053.044.097.097.097h5.194c.975 0 1.937-.137 2.886-.41a7.603 7.603 0 0 0 2.555-1.283 6.488 6.488 0 0 0 1.824-2.225c.461-.902.692-1.974.692-3.217 0-1.336-.234-2.458-.702-3.367-.468-.908-1.082-1.633-1.844-2.174zm-27.459 10.647a.098.098 0 0 1 .006.136 6.772 6.772 0 0 1-2.262 1.642c-.922.421-1.984.632-3.186.632-1.096 0-2.108-.18-3.037-.541a7.131 7.131 0 0 1-2.415-1.533 7.1 7.1 0 0 1-1.603-2.375c-.387-.922-.581-1.937-.581-3.047 0-1.135.197-2.164.591-3.086a6.863 6.863 0 0 1 1.634-2.355 7.236 7.236 0 0 1 2.445-1.493 8.625 8.625 0 0 1 3.026-.521c1.002 0 1.987.177 2.956.531.936.342 1.7.837 2.293 1.484a.097.097 0 0 1-.004.135l-2.18 2.18a.098.098 0 0 1-.146-.01 2.882 2.882 0 0 0-1.196-.893 4.192 4.192 0 0 0-1.603-.32c-.601 0-1.152.11-1.653.33a3.88 3.88 0 0 0-1.293.912c-.36.388-.641.845-.842 1.373-.2.528-.3 1.105-.3 1.733 0 .642.1 1.23.3 1.764.2.535.478.992.832 1.373.354.38.778.678 1.273.892.494.213 1.035.32 1.623.32.681 0 1.276-.133 1.784-.4a3.484 3.484 0 0 0 1.157-.956.097.097 0 0 1 .144-.012l2.237 2.105zm11.454-3.077a.661.661 0 0 1-.328.568l-3.328 1.929a.661.661 0 0 1-.662 0l-3.33-1.929a.661.661 0 0 1-.329-.571v-3.86c0-.235.126-.452.33-.57l3.327-1.929a.661.661 0 0 1 .663 0l3.328 1.928a.661.661 0 0 1 .33.572v3.862zm-3.988-9.35a7.418 7.418 0 1 0 0 14.837 7.418 7.418 0 0 0 0-14.837z"/>
+                </g>
+            </svg>
         </div>
-        <div id="console"></div>
-        <div id="files"></div>
-        <div id="editor-wrap">
-            <div id="editor"></div>
+    </div>
+
+    <div id="layout">
+
+
+        <div id="pane-editors" class="split split-vertical">
+            <div id="pane-console" class="split split-horizontal">
+                <div class="tabs-wrap"><input type="radio" id="console_tab" name="console_tab" value="console_tab" checked ><label for="console_tab">Console</label></div>
+                <div id="console-wrap" class="pane-content"><div id="console"></div></div>
+            </div>
+            <div id="pane-editor" class="split split-horizontal">
+                <div id="files" class="tabs-wrap"></div>
+                <div id="editor-wrap">
+                    <div id="editor"></div>
+                    <button onclick="codepad_reload()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 15">
+    <path fill="#FFF" fill-rule="evenodd" d="M10.713 2.287L12.488.512A.3.3 0 0 1 13 .724V6H7.724a.3.3 0 0 1-.212-.512l1.772-1.772a4 4 0 1 0-.456 5.113l1.415 1.414a6 6 0 1 1 .47-7.956z" opacity=".6"/>
+</svg>Reload</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="pane-canvas" class="split split-vertical pane-content">
+            <div id="app-container" class="canvas-app-container">
+                <canvas id="canvas" class="canvas-app-canvas" tabindex="1" width="720" height="720"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -222,6 +353,7 @@ end
       <script type='text/javascript' src="DefoldCodePad.js" async onload=""></script>
     <!-- -->
 
+    <script src="https://unpkg.com/split.js/split.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js" type="text/javascript"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js" integrity="sha256-U//RSeH3TR3773Rk+1lAufJnRjEaG5LcdbvGV72kHEM=" crossorigin="anonymous"></script>
@@ -242,6 +374,17 @@ end
         };
         window.onresize = fix_canvas_size;
 
+        // Setup panel splitters
+        Split(['#pane-editors', '#pane-canvas'], {
+            direction: 'vertical',
+            onDrag: function() { fix_canvas_size(); }
+        });
+
+        Split(['#pane-console', '#pane-editor'], {
+            sizes: [30, 70]
+        });
+
+        // Engine setup
         var extra_params = {
             archive_location_filter: function( path ) {
                 return ("archive" + path + "");
@@ -276,12 +419,8 @@ end
             }
         };
 
+        // Run engine
         Module.runApp("canvas", extra_params);
-
-        /* Fullscreen button */
-        document.getElementById("fullscreen").onclick = function (e) {
-          Module.toggleFullscreen();
-        };
 
         function codepad_change_scene() {
           codepad_should_change_scene = true;
@@ -304,6 +443,10 @@ end
           var default_script = document.getElementById("default_script");
           var default_content = default_script.innerText;
 
+          var script_icon = document.getElementById("icon-script");
+          script_icon = script_icon.innerHTML;
+          console.log(script_icon);
+
           var new_buttons = "";
           for (var i = 0; i < session_info.length; i++)
           {
@@ -320,7 +463,7 @@ end
               checked = " checked";
               editor.setSession(file_session);
             }
-            var new_file_button = '<input type="radio" onchange="codepad_change_file()" id="' + radio_id + '" name="current_file" value="' + radio_id + '"' + checked + '><label for="' + radio_id + '">' + session_info[i] + '</label>';
+            var new_file_button = '<input type="radio" onchange="codepad_change_file()" id="' + radio_id + '" name="current_file" value="' + radio_id + '"' + checked + '><label for="' + radio_id + '">' + script_icon + session_info[i] + '</label>';
             new_buttons = new_buttons + new_file_button;
           }
           files_div.innerHTML = new_buttons;
@@ -738,5 +881,131 @@ end
         readOnly: false // false if this command should not apply in readOnly mode
     });
     </script>
+    <style type="text/css">
+        .ace-tomorrow-night-eighties .ace_gutter {
+          background: #27292d;
+          color: #CCC
+        }
+
+        .ace-tomorrow-night-eighties .ace_print-margin {
+          width: 1px;
+          background: #27292d
+        }
+
+        .ace-tomorrow-night-eighties {
+          background-color: #27292d;
+          color: #CCCCCC
+        }
+
+        .ace-tomorrow-night-eighties .ace_constant.ace_other,
+        .ace-tomorrow-night-eighties .ace_cursor {
+          color: #CCCCCC
+        }
+
+        .ace-tomorrow-night-eighties .ace_marker-layer .ace_selection {
+          background: #4e4a46
+        }
+
+        .ace-tomorrow-night-eighties.ace_multiselect .ace_selection.ace_start {
+          box-shadow: 0 0 3px 0px #2D2D2D;
+        }
+
+        .ace-tomorrow-night-eighties .ace_marker-layer .ace_step {
+          background: rgb(102, 82, 0)
+        }
+
+        .ace-tomorrow-night-eighties .ace_marker-layer .ace_bracket {
+          margin: -1px 0 0 -1px;
+          border: 1px solid #6A6A6A
+        }
+
+        .ace-tomorrow-night-bright .ace_stack {
+          background: rgb(66, 90, 44)
+        }
+
+        .ace-tomorrow-night-eighties .ace_marker-layer .ace_active-line {
+          background: #393939
+        }
+
+        .ace-tomorrow-night-eighties .ace_gutter-active-line {
+          background-color: #393939
+        }
+
+        .ace-tomorrow-night-eighties .ace_marker-layer .ace_selected-word {
+          border: 1px solid #515151
+        }
+
+        .ace-tomorrow-night-eighties .ace_invisible {
+          color: #6A6A6A
+        }
+
+        .ace-tomorrow-night-eighties .ace_keyword,
+        .ace-tomorrow-night-eighties .ace_meta,
+        .ace-tomorrow-night-eighties .ace_storage,
+        .ace-tomorrow-night-eighties .ace_storage.ace_type,
+        .ace-tomorrow-night-eighties .ace_support.ace_type {
+          color: #ff6506
+        }
+
+        .ace-tomorrow-night-eighties .ace_keyword.ace_operator {
+          color: #66CCCC
+        }
+
+        .ace-tomorrow-night-eighties .ace_constant.ace_character,
+        .ace-tomorrow-night-eighties .ace_constant.ace_language,
+        .ace-tomorrow-night-eighties .ace_constant.ace_numeric,
+        .ace-tomorrow-night-eighties .ace_keyword.ace_other.ace_unit,
+        .ace-tomorrow-night-eighties .ace_support.ace_constant,
+        .ace-tomorrow-night-eighties .ace_variable.ace_parameter {
+          color: #aba7ff
+        }
+
+        .ace-tomorrow-night-eighties .ace_invalid {
+          color: #CDCDCD;
+          background-color: #F2777A
+        }
+
+        .ace-tomorrow-night-eighties .ace_invalid.ace_deprecated {
+          color: #CDCDCD;
+          background-color: #ff6506
+        }
+
+        .ace-tomorrow-night-eighties .ace_fold {
+          background-color: #6699CC;
+          border-color: #CCCCCC
+        }
+
+        .ace-tomorrow-night-eighties .ace_entity.ace_name.ace_function,
+        .ace-tomorrow-night-eighties .ace_support.ace_function,
+        .ace-tomorrow-night-eighties .ace_variable {
+          color: #6699CC
+        }
+
+        .ace-tomorrow-night-eighties .ace_support.ace_class,
+        .ace-tomorrow-night-eighties .ace_support.ace_type {
+          color: #FFCC66
+        }
+
+        .ace-tomorrow-night-eighties .ace_heading,
+        .ace-tomorrow-night-eighties .ace_markup.ace_heading,
+        .ace-tomorrow-night-eighties .ace_string {
+          color: #fccf00
+        }
+
+        .ace-tomorrow-night-eighties .ace_comment {
+          color: #b0b0b0
+        }
+
+        .ace-tomorrow-night-eighties .ace_entity.ace_name.ace_tag,
+        .ace-tomorrow-night-eighties .ace_entity.ace_other.ace_attribute-name,
+        .ace-tomorrow-night-eighties .ace_meta.ace_tag,
+        .ace-tomorrow-night-eighties .ace_variable {
+          color: #e5a863
+        }
+
+        .ace-tomorrow-night-eighties .ace_indent-guide {
+          background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ09NrYAgMjP4PAAtGAwchHMyAAAAAAElFTkSuQmCC) right repeat-y
+        }
+    </style>
 </body>
 </html>
